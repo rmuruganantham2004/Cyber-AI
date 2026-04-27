@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THREAT-INTEL | Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- HEADER -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon"></div>
+                <div>
+                    <h1>THREAT-INTEL</h1>
+                    <h2>AI CYBER THREAT INTELLIGENCE SYSTEM v1.0</h2>
+                </div>
+            </div>
+            <div class="status-indicators">
+                <div class="status-item"><span class="dot green"></span> CONNECTING</div>
+                <div class="status-item border-red">THREAT: CRITICAL</div>
+                <div class="status-item time" id="clock">--:--:--</div>
+            </div>
+        </header>
+
+        <!-- METRICS ROW -->
+        <section class="metrics-row">
+            <div class="metric-card">
+                <div class="metric-title">// TOTAL LOGS</div>
+                <div class="metric-value green" id="val-total-logs">0</div>
+                <div class="metric-sub">+0/sec</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-title">// ACTIVE ALERTS</div>
+                <div class="metric-value red" id="val-active-alerts">0</div>
+                <div class="metric-sub">last 60s</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-title">// THREAT SCORE</div>
+                <div class="metric-value orange" id="val-threat-score">0.00</div>
+                <div class="metric-sub">ensemble avg</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-title">// GRAPH NODES</div>
+                <div class="metric-value blue" id="val-graph-nodes">0</div>
+                <div class="metric-sub"><span id="val-graph-edges">0</span> edges</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-title">// MODEL F1</div>
+                <div class="metric-value green" id="val-model-f1">0.93</div>
+                <div class="metric-sub">ensemble</div>
+            </div>
+        </section>
+
+        <!-- MAIN GRID -->
+        <div class="main-grid">
+            <!-- LEFT COLUMN -->
+            <div class="left-col">
+                <!-- LIVE LOG STREAM -->
+                <div class="panel log-stream-panel">
+                    <div class="panel-header">
+                        <div class="panel-title">// LIVE LOG STREAM</div>
+                        <div class="badge green-badge"><span class="dot green"></span> LIVE</div>
+                    </div>
+                    <div class="panel-body" id="log-stream">
+                        <div class="loading-text">Waiting for log data...<span class="cursor"></span></div>
+                    </div>
+                </div>
+
+                <!-- NLP ENTITY EXTRACTION -->
+                <div class="panel nlp-panel">
+                    <div class="panel-header">
+                        <div class="panel-title">// NLP ENTITY EXTRACTION - LAST EVENT</div>
+                        <div class="badge blue-badge">NER + TF-IDF</div>
+                    </div>
+                    <div class="panel-body" id="nlp-stream">
+                        <div class="dim-text">Awaiting first event...</div>
+                    </div>
+                </div>
+
+                <!-- ANOMALY MODEL ENSEMBLE -->
+                <div class="panel ensemble-panel">
+                    <div class="panel-header">
+                        <div class="panel-title">// ANOMALY MODEL ENSEMBLE</div>
+                        <div class="badge orange-badge">3 MODELS</div>
+                    </div>
+                    <div class="panel-body ensemble-grid">
+                        <div class="model-stat">
+                            <div class="model-name">ISOLATION FOREST</div>
+                            <div class="model-score green" id="score-iso">0.85</div>
+                            <div class="model-bar"><div class="fill green-bg" style="width: 85%"></div></div>
+                            <div class="model-sub">precision / recall</div>
+                        </div>
+                        <div class="model-stat">
+                            <div class="model-name">AUTOENCODER</div>
+                            <div class="model-score green" id="score-ae">0.88</div>
+                            <div class="model-bar"><div class="fill green-bg" style="width: 88%"></div></div>
+                            <div class="model-sub">reconstruction err</div>
+                        </div>
+                        <div class="model-stat">
+                            <div class="model-name">GNN</div>
+                            <div class="model-score orange" id="score-gnn">0.73</div>
+                            <div class="model-bar"><div class="fill orange-bg" style="width: 73%"></div></div>
+                            <div class="model-sub">decision boundary</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div class="right-col">
+                <!-- THREAT ALERTS -->
+                <div class="panel alerts-panel">
+                    <div class="panel-header">
+                        <div class="panel-title">// THREAT ALERTS</div>
+                        <div class="badge red-badge" id="badge-active-alerts">0 ACTIVE</div>
+                    </div>
+                    <div class="panel-body" id="alerts-stream">
+                        <div class="loading-text">No alerts yet<span class="cursor"></span></div>
+                    </div>
+                </div>
+                
+                <!-- MITRE ATT&CK -->
+                <div class="panel mitre-panel">
+                    <div class="panel-header">
+                        <div class="panel-title">// MITRE ATT&CK</div>
+                        <div class="badge orange-badge">LIVE MAP</div>
+                    </div>
+                    <div class="panel-body flex-center">
+                        <div class="dim-text">No tactics detected</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GRAPH ROW -->
+        <div class="panel graph-panel">
+            <div class="panel-header">
+                <div class="panel-title">// KNOWLEDGE GRAPH - ENTITY RELATIONSHIP NETWORK</div>
+                <div class="graph-legend">
+                    <span class="dot red"></span> attacker
+                    <span class="dot blue"></span> target
+                    <span class="dot orange"></span> pivot
+                    <div class="badge green-badge"><span class="dot green"></span> LIVE</div>
+                </div>
+            </div>
+            <div class="panel-body" id="network-graph">
+                <!-- Vis.js will render here -->
+            </div>
+        </div>
+    </div>
+    <script src="/static/app.js"></script>
+</body>
+</html>
